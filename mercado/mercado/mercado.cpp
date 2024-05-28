@@ -163,6 +163,8 @@ void agregarCliente(MYSQL* conectar) {
 
 
 */
+
+//prueba
 #include <mysql.h>
 #include <sstream>
 #include <iostream>
