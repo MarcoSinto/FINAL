@@ -186,8 +186,9 @@ void subMenuGestionClientes(MYSQL* conectar) {
     do {
         cout << "===== SUBMENU GESTION CLIENTES =====" << endl;
         cout << "1. Agregar Cliente" << endl;
-        cout << "2. Mostrar Clientes" << endl;
-        cout << "3. Regresar al menu principal" << endl;
+        cout << "2. editar Cliente" << endl;
+        cout << "3. Mostrar Clientes" << endl;
+        cout << "4. Regresar al menu principal" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
         cin.ignore(); // Ignorar el salto de línea pendiente después de cin
@@ -198,9 +199,12 @@ void subMenuGestionClientes(MYSQL* conectar) {
             
             break;
         case 2:
-            mostrarCliente(conectar);
+            editarCliente(conectar);
             break;
         case 3:
+            mostrarCliente(conectar);
+            break;
+        case 4:
             // Regresar al menú principal
             system("cls");
             return;
@@ -462,6 +466,59 @@ void mostrarCliente(MYSQL* conectar) {
     }
     else {
         cout << "Error al consultar" << endl;
+    }
+}
+
+void editarCliente(MYSQL* conectar) {
+    int id;
+    string nombres, apellidos, nit, genero, correo;
+    int telefono;
+
+    cout << "===== EDICION DE CLIENTE =====" << endl << endl;
+
+    cout << "Ingrese el ID del cliente a editar: ";
+    cin >> id;
+    cin.ignore(); // Ignorar el salto de línea pendiente
+
+    cout << "Ingrese los nombres: ";
+    getline(cin, nombres);
+
+    cout << "Ingrese los apellidos: ";
+    getline(cin, apellidos);
+
+    cout << "Ingrese el nit (con guiones) (c/f): ";
+    getline(cin, nit);
+
+    cout << "Ingrese el genero (M/F): ";
+    getline(cin, genero);
+
+    cout << "Ingrese el telefono (sin guiones): ";
+    cin >> telefono;
+    cin.ignore();
+
+    cout << "Ingrese el correo electronico: ";
+    getline(cin, correo);
+
+    ostringstream updateQuery;
+    updateQuery << "UPDATE clientes SET "
+        << "nombres = '" << nombres << "', "
+        << "apellidos = '" << apellidos << "', "
+        << "nit = '" << nit << "', "
+        << "genero = '" << genero << "', "
+        << "telefono = '" << telefono << "', "
+        << "correo_electronico = '" << correo << "' "
+        << "WHERE idCliente = " << id;
+
+    string update = updateQuery.str();
+    const char* u = update.c_str();
+
+    int q_estado = mysql_query(conectar, u);
+    if (!q_estado) {
+        cout << "Actualizacion de cliente exitosa..." << endl;
+    }
+    else {
+        cout << "** Error al actualizar cliente * " << endl;
+        mostrarError(conectar);
     }
 }
 
