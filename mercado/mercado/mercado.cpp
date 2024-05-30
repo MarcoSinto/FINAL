@@ -34,6 +34,7 @@ void subMenuProveedores(MYSQL* conectar);
 void subMenuProductos(MYSQL* conectar);
 
 //funciones
+void editarCliente(MYSQL* conectar);
 void agregarMarca(MYSQL* conectar);
 void agregarProductos(MYSQL* conectar);
 void mostrarMarca(MYSQL* conectar);
@@ -196,7 +197,6 @@ void subMenuGestionClientes(MYSQL* conectar) {
         switch (opcion) {
         case 1:
             agregarCliente(conectar);
-            
             break;
         case 2:
             editarCliente(conectar);
