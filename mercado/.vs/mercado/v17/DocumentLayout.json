@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\IT\\Desktop\\Nueva carpeta\\mercado\\",
+  "WorkspaceRootPath": "C:\\Users\\PC\\Desktop\\PROYECTO\\FINAL\\FINAL\\mercado\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EB5FC14A-9993-4CFF-9A68-A778FAD3C745}|mercado\\mercado.vcxproj|C:\\Users\\IT\\Desktop\\Nueva carpeta\\mercado\\mercado\\mercado.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{EB5FC14A-9993-4CFF-9A68-A778FAD3C745}|mercado\\mercado.vcxproj|C:\\Users\\PC\\Desktop\\PROYECTO\\FINAL\\FINAL\\mercado\\mercado\\mercado.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{EB5FC14A-9993-4CFF-9A68-A778FAD3C745}|mercado\\mercado.vcxproj|solutionrelative:mercado\\mercado.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "mercado.cpp",
-              "DocumentMoniker": "C:\\Users\\IT\\Desktop\\Nueva carpeta\\mercado\\mercado\\mercado.cpp",
+              "DocumentMoniker": "C:\\Users\\PC\\Desktop\\PROYECTO\\FINAL\\FINAL\\mercado\\mercado\\mercado.cpp",
               "RelativeDocumentMoniker": "mercado\\mercado.cpp",
-              "ToolTip": "C:\\Users\\IT\\Desktop\\Nueva carpeta\\mercado\\mercado\\mercado.cpp",
+              "ToolTip": "C:\\Users\\PC\\Desktop\\PROYECTO\\FINAL\\FINAL\\mercado\\mercado\\mercado.cpp",
               "RelativeToolTip": "mercado\\mercado.cpp",
-              "ViewState": "AQIAACEAAAAAAAAAAAAswLUBAAAkAAAA",
+              "ViewState": "AQIAAO4BAAAAAAAAAAAAAO8BAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-05-28T15:22:45.181Z",
               "EditorCaption": ""

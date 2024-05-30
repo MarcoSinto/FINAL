@@ -67,7 +67,7 @@ int main() {
         int opcion;
         do {
             cout << "===== SUPERECONOMICO =====" << endl;
-            cout << "1. ADMIN" << endl;
+            cout << "1. ADMINISTRADOR" << endl;
             cout << "2. GESTION CLIENTES" << endl;
             cout << "3. GESTION PRODUCTOS" << endl;
             cout << "4. GESTION VENTAS" << endl;
@@ -489,7 +489,7 @@ void editarPuesto(MYSQL* conectar) {
 void agregarPuesto(MYSQL* conectar) {
     string puesto;
     cout << "Ingrese Puesto: ";
-    cin >> puesto;
+    getline(cin,puesto);
     string insert = "INSERT INTO puestos(puesto) VALUES('" + puesto + "')";
     const char* i = insert.c_str();
     q_estado = mysql_query(conectar, i);
