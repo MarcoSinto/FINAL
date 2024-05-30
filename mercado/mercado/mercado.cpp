@@ -2,28 +2,14 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <ctime>
+#include <vector>
+#include <tuple>
+using namespace std;
+
 using namespace std;
 
 int q_estado;
-
-/*
-void subMenuAdmin(MYSQL* conectar);
-void subMenuPuesto(MYSQL* conectar);
-void subMenuGestionClientes(MYSQL* conectar);
-void subMenuGestionVentas(MYSQL* conectar);
-void subMenuEmpleados(MYSQL* conectar);
-void subMenuProveedores(MYSQL* conectar);
-void subMenuProductos(MYSQL* conectar);
-
-//funciones
-void agregarPuesto(MYSQL* conectar);
-void mostrarPuestos(MYSQL* conectar);
-void agregarCliente(MYSQL* conectar);
-void mostrarError(MYSQL* conectar);
-void mostrarCliente(MYSQL* conectar);
-void registrarVenta(MYSQL* conectar);
-void mostrarVentas(MYSQL* conectar);
-void agregarEmpleado(MYSQL* conectar);*/
 
 void subMenuAdmin(MYSQL* conectar);
 void subMenuPuesto(MYSQL* conectar);
@@ -700,19 +686,6 @@ void subMenuGestionVentas(MYSQL* conectar) {
     } while (opcion != 3);
 }
 
-void registrarVenta(MYSQL* conectar) {
-    string nit, nombres, apellidos;
-
-    cout << "Ingrese el NIT del cliente (con guiones) (c/f): ";
-    getline(cin, nit);
-
-    agregarClienteSiNoExiste(conectar, nit);
-
-    // Aquí puedes agregar más lógica para registrar la venta
-    // Por ejemplo, solicitar detalles de los productos comprados, cantidad, etc.
-    cout << "Registro de venta en desarrollo..." << endl;
-}
-
 void mostrarVentas(MYSQL* conectar) {
     // Implementar la lógica para mostrar las ventas registradas
     cout << "Mostrar ventas en desarrollo..." << endl;
@@ -1052,3 +1025,169 @@ void mostrarMarca(MYSQL* conectar) {
         mostrarError(conectar);
     }
 }
+
+string obtenerFechaActual() {
+    time_t t = time(0);
+    struct tm* now = localtime(&t);
+    char buffer[80];
+    strftime(buffer, 80, "%Y-%m-%d", now);
+    return string(buffer);
+}
+
+int obtenerNuevoNumeroFactura(MYSQL* conectar) {
+    int nuevoNumero = 1;
+    string query = "SELECT MAX(numerofactura) FROM ventas";
+    const char* q = query.c_str();
+    q_estado = mysql_query(conectar, q);
+    if (!q_estado) {
+        MYSQL_RES* res = mysql_store_result(conectar);
+        MYSQL_ROW row = mysql_fetch_row(res);
+        if (row[0]) {
+            nuevoNumero = stoi(row[0]) + 1;
+        }
+        mysql_free_result(res);
+    }
+    else {
+        mostrarError(conectar);
+    }
+    return nuevoNumero;
+}
+
+// Función para registrar una venta
+/*void registrarVenta(MYSQL* conectar) {
+    string nit;
+    cout << "Ingrese NIT del cliente: ";
+    cin >> nit;
+
+    string fecha = obtenerFechaActual();
+    int numerofactura = obtenerNuevoNumeroFactura(conectar);
+    string serie = "A"; // Suponiendo que la serie siempre es "A", puedes cambiar esto según tus necesidades.
+
+    // Asegurarse de que el cliente existe o agregarlo si no existe
+    string nombres, apellidos;
+    if (!buscarClientePorNIT(conectar, nit, nombres, apellidos)) {
+        agregarClienteSiNoExiste(conectar, nit);
+        buscarClientePorNIT(conectar, nit, nombres, apellidos);
+    }
+
+    // Obtener el total de la venta (puedes cambiar esto según tus necesidades)
+    double total;
+    cout << "Ingrese el total de la venta: ";
+    cin >> total;
+
+    // Insertar la venta en la base de datos
+    stringstream ss;
+    ss << "INSERT INTO ventas (nit, fecha, numerofactura, serie, total) VALUES ('"
+        << nit << "', '" << fecha << "', " << numerofactura << ", '" << serie << "', " << total << ")";
+    string query = ss.str();
+    const char* q = query.c_str();
+    q_estado = mysql_query(conectar, q);
+    if (!q_estado) {
+        cout << "Venta registrada exitosamente." << endl;
+    }
+    else {
+        mostrarError(conectar);
+    }
+}*/
+
+// Función para buscar producto por ID
+bool buscarProductoPorID(MYSQL* conectar, int id_producto, string& producto, string& marca, double& precio_venta) {
+    bool encontrado = false;
+    string query = "SELECT producto, marca, precio_venta FROM productos WHERE id_producto = " + to_string(id_producto);
+    const char* q = query.c_str();
+    q_estado = mysql_query(conectar, q);
+    if (!q_estado) {
+        MYSQL_RES* res = mysql_store_result(conectar);
+        MYSQL_ROW row = mysql_fetch_row(res);
+        if (row) {
+            producto = row[0];
+            marca = row[1];
+            precio_venta = stod(row[2]);
+            encontrado = true;
+        }
+        mysql_free_result(res);
+    }
+    else {
+        mostrarError(conectar);
+    }
+    return encontrado;
+}
+
+void registrarVenta(MYSQL* conectar) {
+    string nit;
+    cout << "Ingrese NIT del cliente: ";
+    cin >> nit;
+
+    string fecha = obtenerFechaActual();
+    int numerofactura = obtenerNuevoNumeroFactura(conectar);
+    string serie = "A"; // Suponiendo que la serie siempre es "A", puedes cambiar esto según tus necesidades.
+
+    // Asegurarse de que el cliente existe o agregarlo si no existe
+    string nombres, apellidos;
+    if (!buscarClientePorNIT(conectar, nit, nombres, apellidos)) {
+        agregarClienteSiNoExiste(conectar, nit);
+        buscarClientePorNIT(conectar, nit, nombres, apellidos);
+    }
+
+    // Variables para totalizar la venta
+    double total = 0;
+    int id_producto;
+    int cantidad;
+    vector<tuple<int, int, double, double>> detalles; // id_producto, cantidad, precio_venta, subtotal
+
+    // Ingresar productos
+    while (true) {
+        cout << "Ingrese ID del producto (0 para finalizar): ";
+        cin >> id_producto;
+        if (id_producto == 0) break;
+
+        string producto, marca;
+        double precio_venta;
+        if (buscarProductoPorID(conectar, id_producto, producto, marca, precio_venta)) {
+            cout << "Producto: " << producto << " | Marca: " << marca << " | Precio: " << precio_venta << endl;
+            cout << "Ingrese la cantidad: ";
+            cin >> cantidad;
+
+            double subtotal = precio_venta * cantidad;
+            total += subtotal;
+            detalles.push_back(make_tuple(id_producto, cantidad, precio_venta, subtotal));
+        }
+        else {
+            cout << "Producto no encontrado." << endl;
+        }
+    }
+    stringstream ss;
+    ss << "INSERT INTO ventas (nit, fecha, numerofactura, serie, total) VALUES ('"
+        << nit << "', '" << fecha << "', " << numerofactura << ", '" << serie << "', " << total << ")";
+    string query = ss.str();
+    const char* q = query.c_str();
+    q_estado = mysql_query(conectar, q);
+    if (!q_estado) {
+        int idventa = mysql_insert_id(conectar); // Obtener el ID de la venta insertada
+
+        // Insertar detalles de la venta en la base de datos
+        for (const auto& detalle : detalles) {
+            int id_producto = get<0>(detalle);
+            int cantidad = get<1>(detalle);
+            double precio_venta = get<2>(detalle);
+            double subtotal = get<3>(detalle);
+
+            stringstream ss_det;
+            ss_det << "INSERT INTO ventas_detalle (idventa, id_producto, cantidad, precio_venta, subtotal) VALUES ("
+                << idventa << ", " << id_producto << ", " << cantidad << ", " << precio_venta << ", " << subtotal << ")";
+            string query_det = ss_det.str();
+            const char* q_det = query_det.c_str();
+            q_estado = mysql_query(conectar, q_det);
+            if (q_estado) {
+                mostrarError(conectar);
+            }
+        }
+
+        cout << "Venta registrada exitosamente." << endl;
+    }
+    else {
+        mostrarError(conectar);
+    }
+}
+
+//NO MODIFICAR ATRAS
