@@ -5,6 +5,8 @@
 #include <ctime>
 #include <vector>
 #include <tuple>
+#include <iomanip> 
+
 using namespace std;
 
 using namespace std;
@@ -43,7 +45,7 @@ void editarProveedor(MYSQL* conectar);
 bool validarNIT(const string& nit);
 bool buscarClientePorNIT(MYSQL* conectar, const string& nit, string& nombres, string& apellidos);
 void agregarClienteSiNoExiste(MYSQL* conectar, const string& nit);
-
+void imprimirFactura(MYSQL* conectar, int idVenta);
 
 int main() {
     MYSQL* conectar;
@@ -1028,15 +1030,16 @@ void mostrarMarca(MYSQL* conectar) {
 
 string obtenerFechaActual() {
     time_t t = time(0);
-    struct tm* now = localtime(&t);
+    struct tm now;
+    localtime_s(&now, &t); // Usar localtime_s en lugar de localtime
     char buffer[80];
-    strftime(buffer, 80, "%Y-%m-%d", now);
+    strftime(buffer, 80, "%Y-%m-%d", &now);
     return string(buffer);
 }
 
 int obtenerNuevoNumeroFactura(MYSQL* conectar) {
     int nuevoNumero = 1;
-    string query = "SELECT MAX(numerofactura) FROM ventas";
+    string query = "SELECT MAX(nofactura) FROM ventas";
     const char* q = query.c_str();
     q_estado = mysql_query(conectar, q);
     if (!q_estado) {
@@ -1093,7 +1096,7 @@ int obtenerNuevoNumeroFactura(MYSQL* conectar) {
 // Función para buscar producto por ID
 bool buscarProductoPorID(MYSQL* conectar, int id_producto, string& producto, string& marca, double& precio_venta) {
     bool encontrado = false;
-    string query = "SELECT producto, marca, precio_venta FROM productos WHERE id_producto = " + to_string(id_producto);
+    string query = "SELECT producto, idMarca, precio_venta FROM productos WHERE idProducto = " + to_string(id_producto);
     const char* q = query.c_str();
     q_estado = mysql_query(conectar, q);
     if (!q_estado) {
@@ -1113,11 +1116,12 @@ bool buscarProductoPorID(MYSQL* conectar, int id_producto, string& producto, str
     return encontrado;
 }
 
+
+//NO MODIFICAR ATRAS  
 void registrarVenta(MYSQL* conectar) {
     string nit;
     cout << "Ingrese NIT del cliente: ";
-    cin >> nit;
-
+    getline(cin, nit);
     string fecha = obtenerFechaActual();
     int numerofactura = obtenerNuevoNumeroFactura(conectar);
     string serie = "A"; // Suponiendo que la serie siempre es "A", puedes cambiar esto según tus necesidades.
@@ -1156,6 +1160,8 @@ void registrarVenta(MYSQL* conectar) {
             cout << "Producto no encontrado." << endl;
         }
     }
+
+    // Insertar la venta en la base de datos
     stringstream ss;
     ss << "INSERT INTO ventas (nit, fecha, numerofactura, serie, total) VALUES ('"
         << nit << "', '" << fecha << "', " << numerofactura << ", '" << serie << "', " << total << ")";
@@ -1183,6 +1189,9 @@ void registrarVenta(MYSQL* conectar) {
             }
         }
 
+        // Imprimir la factura
+        imprimirFactura(conectar, idventa);
+
         cout << "Venta registrada exitosamente." << endl;
     }
     else {
@@ -1190,4 +1199,73 @@ void registrarVenta(MYSQL* conectar) {
     }
 }
 
-//NO MODIFICAR ATRAS
+
+void imprimirFactura(MYSQL* conectar, int idventa) {
+    // Obtener los detalles de la venta
+    string queryVenta = "SELECT v.nit, v.fecha, v.numerofactura, v.serie, v.total, c.nombres, c.apellidos "
+        "FROM ventas v "
+        "INNER JOIN clientes c ON v.nit = c.nit "
+        "WHERE v.idventa = " + to_string(idventa);
+    const char* qv = queryVenta.c_str();
+    q_estado = mysql_query(conectar, qv);
+    if (!q_estado) {
+        MYSQL_RES* resVenta = mysql_store_result(conectar);
+        MYSQL_ROW rowVenta = mysql_fetch_row(resVenta);
+        if (rowVenta) {
+            string nit = rowVenta[0];
+            string fecha = rowVenta[1];
+            int numerofactura = stoi(rowVenta[2]);
+            string serie = rowVenta[3];
+            double total = stod(rowVenta[4]);
+            string nombres = rowVenta[5];
+            string apellidos = rowVenta[6];
+
+            cout << "===== FACTURA =====" << endl;
+            cout << "NIT Cliente: " << nit << endl;
+            cout << "Nombre Cliente: " << nombres << " " << apellidos << endl;
+            cout << "Fecha: " << fecha << endl;
+            cout << "Numero de Factura: " << numerofactura << endl;
+            cout << "Serie: " << serie << endl;
+            cout << "===================" << endl;
+
+            // Obtener los detalles de los productos en la venta
+            string queryDetalle = "SELECT p.producto, p.marca, vd.cantidad, vd.precio_venta, vd.subtotal "
+                "FROM ventas_detalle vd "
+                "INNER JOIN productos p ON vd.id_producto = p.id_producto "
+                "WHERE vd.idventa = " + to_string(idventa);
+            const char* qd = queryDetalle.c_str();
+            q_estado = mysql_query(conectar, qd);
+            if (!q_estado) {
+                MYSQL_RES* resDetalle = mysql_store_result(conectar);
+                MYSQL_ROW rowDetalle;
+                cout << left << setw(10) << "Producto" << setw(15) << "Marca" << setw(10) << "Cantidad"
+                    << setw(15) << "Precio Venta" << setw(10) << "Subtotal" << endl;
+                cout << "-------------------------------------------------------------" << endl;
+                while ((rowDetalle = mysql_fetch_row(resDetalle))) {
+                    string producto = rowDetalle[0];
+                    string marca = rowDetalle[1];
+                    int cantidad = stoi(rowDetalle[2]);
+                    double precio_venta = stod(rowDetalle[3]);
+                    double subtotal = stod(rowDetalle[4]);
+
+                    cout << left << setw(10) << producto << setw(15) << marca << setw(10) << cantidad
+                        << setw(15) << fixed << setprecision(2) << precio_venta
+                        << setw(10) << fixed << setprecision(2) << subtotal << endl;
+                }
+                mysql_free_result(resDetalle);
+                cout << "-------------------------------------------------------------" << endl;
+                cout << "Total: " << total << endl;
+            }
+            else {
+                mostrarError(conectar);
+            }
+        }
+        else {
+            cout << "Venta no encontrada." << endl;
+        }
+        mysql_free_result(resVenta);
+    }
+    else {
+        mostrarError(conectar);
+    }
+}
