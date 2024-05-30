@@ -455,7 +455,8 @@ void mostrarCliente(MYSQL* conectar) {
                 <<  (fila[3] ? fila[3] : "NULL") << ", "
                 <<  (fila[4] ? fila[4] : "NULL") << ", "
                 <<  (fila[5] ? fila[5] : "NULL") << ", "
-                <<  (fila[6] ? fila[6] : "NULL") << endl;
+                << (fila[6] ? fila[6] : "NULL") << ", "
+                <<  (fila[7] ? fila[7] : "NULL") << endl;
         }
         mysql_free_result(resultado);  // Liberar la memoria del resultado
     }
