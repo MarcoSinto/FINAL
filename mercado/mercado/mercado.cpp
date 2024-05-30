@@ -425,13 +425,13 @@ void editarEmpleado(MYSQL* conectar) {
         "', id_puesto = " + n_idPuesto +
         ", fecha_inicio_labores = '" + n_fechaIL +
         "', fecha_ingreso = '" + n_fechaIng +
-        "' WHERE id = " + to_string(id);
+        "' WHERE idPuesto = " + to_string(id);
 
     const char* u = update.c_str();
     int q_estado = mysql_query(conectar, u);
 
     if (!q_estado) {
-        cout << "Actualización Exitosa..." << endl;
+        cout << "Actualizacion Exitosa..." << endl;
     }
     else {
         cout << "**** Error al actualizar **** " << endl;
@@ -588,7 +588,7 @@ bool validarNIT(const string& nit) {
         return true;
     }
     size_t len = nit.length();
-    if (len < 9 || len > 17) {
+    if (len < 6 || len > 9) {
         return false;
     }
     // Validar que contenga solo dígitos o guiones
@@ -777,6 +777,7 @@ void agregarProveedor(MYSQL* conectar) {
     }
     else {
         cout << "**** Error al ingresar proveedor *** " << endl;
+        mostrarError(conectar);
     }
 }
 
@@ -806,39 +807,44 @@ void mostrarProveedor(MYSQL* conectar) {
         mostrarError(conectar);
     }
 }
-void editarProveedor(MYSQL * conectar) {
-        int id;
-        string n_proveedor, n_direccion;
-        int n_nit, n_telefono;
-        cout << "Ingrese el ID del proveedor a editar: ";
-        cin >> id;
-        cout << "Ingrese el nuevo nombre del proveedor: ";
-        getline(cin, n_proveedor);
-        cout << "Ingrese el nuevo nit del proveedor: ";
-        cin >> n_nit;
-        cin.ignore();
-        cout << "Ingrese la nueva direccion del proveedor: ";
-        getline(cin, n_direccion);
-        cout << "Ingrese el nuevo telefono del proveedor: ";
-        cin >> n_telefono;
-        cin.ignore();
+void editarProveedor(MYSQL* conectar) {
+    int id;
+    string n_proveedor, n_direccion, n_nit, n_telefono;
 
-        string update = "UPDATE proveedores SET proveedor = '" + n_proveedor +
-            "', nit = " + to_string(n_nit) +
-            ", direccion = '" + n_direccion +
-            "', telefono = " + to_string(n_telefono) +
-            " WHERE id = " + to_string(id);
+    cout << "Ingrese el ID del proveedor a editar: ";
+    cin >> id;
+    cin.ignore(); 
 
+    cout << "Ingrese el nuevo nombre del proveedor: ";
+    getline(cin, n_proveedor);
 
-        const char* u = update.c_str();
-        int q_estado = mysql_query(conectar, u);
-        if (!q_estado) {
-            cout << "Actualización Exitosa..." << endl;
-        }
-        else {
-            cout << "**** Error al actualizar **** " << endl;
-        }
+    cout << "Ingrese el nuevo nit del proveedor: ";
+    getline(cin, n_nit);
+
+    cout << "Ingrese la nueva direccion del proveedor: ";
+    getline(cin, n_direccion);
+
+    cout << "Ingrese el nuevo telefono del proveedor: ";
+    getline(cin, n_telefono);
+
+    string update = "UPDATE proveedores SET proveedor = '" + n_proveedor +
+        "', nit = '" + n_nit +
+        "', direccion = '" + n_direccion +
+        "', telefono = '" + n_telefono +
+        "' WHERE idProveedore = " + to_string(id);
+
+    const char* u = update.c_str();
+    int q_estado = mysql_query(conectar, u);
+
+    if (!q_estado) {
+        cout << "Actualizacion Exitosa..." << endl;
     }
+    else {
+        cout << "**** Error al actualizar ****" << endl;
+        mostrarError(conectar);
+    }
+}
+
 void subMenuProductos(MYSQL* conectar) {
     int opcion;
     do {
