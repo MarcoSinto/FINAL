@@ -1,8 +1,8 @@
 ﻿  mercado.cpp
-C:\Users\IT\Desktop\Nueva carpeta\mercado\mercado\mercado.cpp(1172,21): warning C4244: 'inicializando': conversión de 'uint64_t' a 'int'; posible pérdida de datos
+C:\Users\saqui\OneDrive\Escritorio\FINAL PROGRA\FINAL\mercado\mercado\mercado.cpp(1250,21): warning C4244: 'inicializando': conversión de 'uint64_t' a 'int'; posible pérdida de datos
   Generando código
   1 of 312 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     1 functions had inline decision re-evaluated but remain unchanged
   Generación de código finalizada
-  mercado.vcxproj -> C:\Users\IT\Desktop\Nueva carpeta\mercado\x64\Release\mercado.exe
+  mercado.vcxproj -> C:\Users\saqui\OneDrive\Escritorio\FINAL PROGRA\FINAL\mercado\x64\Release\mercado.exe
