@@ -26,7 +26,7 @@ void editarCliente(MYSQL* conectar);
 void agregarCliente(MYSQL* conectar);
 void mostrarCliente(MYSQL* conectar);
 void agregarMarca(MYSQL* conectar);
-void editarMarca(MYSQL* conectar);
+void agregarProductos(MYSQL* conectar);
 void mostrarMarca(MYSQL* conectar);
 void agregarProductos(MYSQL* conectar);
 void editarProducto(MYSQL* conectar);
@@ -260,9 +260,6 @@ void agregarCliente(MYSQL* conectar) {
     cout << "Ingrese el correo electronico: ";
     getline(cin, correo);
 
-    cout << "Ingrese la Fecha de Ingreso ";//esto de aqui para leer y guardar
-    getline(cin, fechaingreso);
-
     ostringstream insertQuery;
     insertQuery << "INSERT INTO clientes (nombres, apellidos, nit, genero, telefono, correo_electronico, fechaingreso) VALUES ('"
         << nombres << "', '"
@@ -270,8 +267,7 @@ void agregarCliente(MYSQL* conectar) {
         << nit << "', '"
         << genero << "', '"
         << telefono << "', '"
-        << correo << "', '"
-        << fechaingreso << "')";
+        << correo << "')";
 
     string insert = insertQuery.str();
     const char* i = insert.c_str();
@@ -503,7 +499,7 @@ void editarEmpleado(MYSQL* conectar) {
         ", dpi = " + to_string(n_dpi) +
         ", genero = '" + n_genero +
         "', fecha_nacimiento = '" + n_fechaN +
-        "', id_puesto = " + n_idPuesto +
+        "', id_puesto = " + n_idPuesto +         //en la base de datos aparece como idPuesto
         ", fecha_inicio_labores = '" + n_fechaIL +
         "', fecha_ingreso = '" + n_fechaIng +
         "' WHERE idPuesto = " + to_string(id);
@@ -516,6 +512,89 @@ void editarEmpleado(MYSQL* conectar) {
     }
     else {
         cout << "**** Error al actualizar **** " << endl;
+        mostrarError(conectar);
+    }
+}
+
+void mostrarCliente(MYSQL* conectar) {
+    MYSQL_ROW fila;
+    MYSQL_RES* resultado;
+
+    string consulta = "SELECT * FROM clientes";
+    const char* c = consulta.c_str();
+    q_estado = mysql_query(conectar, c);
+    if (!q_estado) {
+        resultado = mysql_store_result(conectar);
+        cout << "Lista de clientes:" << endl;
+        cout << "ID" << " , " << "NOMBRES" << " , " << "APELLIDOS" << " , " << "NIT" << " , " << "GENERO" << " , " << "TELEFONO" << " , " << "CORREO" << " , " << endl;
+        while ((fila = mysql_fetch_row(resultado))) {
+            // Asegúrate de mostrar todas las columnas
+     
+            cout << (fila[0] ? fila[0] : "NULL") << ", "
+                <<  (fila[1] ? fila[1] : "NULL") << ", "
+                <<  (fila[2] ? fila[2] : "NULL") << ", "
+                <<  (fila[3] ? fila[3] : "NULL") << ", "
+                <<  (fila[4] ? fila[4] : "NULL") << ", "
+                <<  (fila[5] ? fila[5] : "NULL") << ", "
+                << (fila[6] ? fila[6] : "NULL") << ", "
+                <<  (fila[7] ? fila[7] : "NULL") << endl;
+        }
+        mysql_free_result(resultado);  // Liberar la memoria del resultado
+    }
+    else {
+        cout << "Error al consultar" << endl;
+    }
+}
+
+void editarCliente(MYSQL* conectar) {
+    int id;
+    string nombres, apellidos, nit, genero, correo;
+    int telefono;
+
+    cout << "===== EDICION DE CLIENTE =====" << endl << endl;
+
+    cout << "Ingrese el ID del cliente a editar: ";
+    cin >> id;
+    cin.ignore(); // Ignorar el salto de línea pendiente
+
+    cout << "Ingrese los nombres: ";
+    getline(cin, nombres);
+
+    cout << "Ingrese los apellidos: ";
+    getline(cin, apellidos);
+
+    cout << "Ingrese el nit (con guiones) (c/f): ";
+    getline(cin, nit);
+
+    cout << "Ingrese el genero (M/F): ";
+    getline(cin, genero);
+
+    cout << "Ingrese el telefono (sin guiones): ";
+    cin >> telefono;
+    cin.ignore();
+
+    cout << "Ingrese el correo electronico: ";
+    getline(cin, correo);
+
+    ostringstream updateQuery;
+    updateQuery << "UPDATE clientes SET "
+        << "nombres = '" << nombres << "', "
+        << "apellidos = '" << apellidos << "', "
+        << "nit = '" << nit << "', "
+        << "genero = '" << genero << "', "
+        << "telefono = '" << telefono << "', "
+        << "correo_electronico = '" << correo << "' "
+        << "WHERE idCliente = " << id;
+
+    string update = updateQuery.str();
+    const char* u = update.c_str();
+
+    int q_estado = mysql_query(conectar, u);
+    if (!q_estado) {
+        cout << "Actualizacion de cliente exitosa..." << endl;
+    }
+    else {
+        cout << "** Error al actualizar cliente * " << endl;
         mostrarError(conectar);
     }
 }
@@ -622,8 +701,8 @@ bool buscarClientePorNIT(MYSQL* conectar, const string& nit, string& nombres, st
 }
 
 void agregarClienteSiNoExiste(MYSQL* conectar, const string& nit) {
-    string nombres, apellidos, genero, correo, fechaingreso;
-    int telefono;
+        string nombres, apellidos, genero, correo;
+        int telefono;
 
         if (!validarNIT(nit)) {
             cout << "NIT invalido. Intente de nuevo." << endl;
@@ -651,12 +730,14 @@ void agregarClienteSiNoExiste(MYSQL* conectar, const string& nit) {
 
         cout << "Ingrese el correo electronico: ";
         getline(cin, correo);
+        cout << "Ingrese la Fecha de Ingreso: ";
+        getline(cin, fechaingreso);
 
         cout << "Ingrese la Fecha de Ingreso: ";
         getline(cin, fechaingreso);
 
         ostringstream insertQuery;
-        insertQuery << "INSERT INTO clientes (nombres, apellidos, nit, genero, telefono, correo_electronico,fechaingreso) VALUES ('"
+        insertQuery << "INSERT INTO clientes (nombres, apellidos, nit, genero, telefono, correo_electronico) VALUES ('"
             << nombres << "', '"
             << apellidos << "', '"
             << nit << "', '"
@@ -701,28 +782,10 @@ void subMenuGestionVentas(MYSQL* conectar) {
         }
     } while (opcion != 3);
 }
-
+                                      //aqui con este codigo ya muestra las ventas 
 void mostrarVentas(MYSQL* conectar) {
     // Implementar la lógica para mostrar las ventas registradas
-    MYSQL_ROW fila;
-    MYSQL_RES* resultado;
-
-    string consulta = "SELECT * FROM ventas";
-    const char* c = consulta.c_str();
-    q_estado = mysql_query(conectar, c);
-
-    if (!q_estado) {
-        resultado = mysql_store_result(conectar);
-        cout << "No Factura| serie | fecha factura | id Cliente | ID Empleado | Fecha Ingreso" << endl;
-        cout << "-------------------------------------------------------------------------------------------" << endl;
-        while ((fila = mysql_fetch_row(resultado))) {
-            cout << fila[0] << " | " << fila[1] << " | " << fila[2] << " | " << fila[3] << " | " << fila[4] << " | " << fila[5] << " | " << fila[6] << endl;
-        }
-        mysql_free_result(resultado);
-    }
-    else {
-        cout << "Error al consultar ventas." << endl;
-    }
+    cout << "Mostrar ventas en desarrollo..." << endl;
 }
 
 void subMenuProveedores(MYSQL* conectar) {
@@ -851,7 +914,7 @@ void editarProveedor(MYSQL* conectar) {
         mostrarError(conectar);
     }
 }
-
+                                             //aqui se agrego la funcion editar marcas
 void subMenuProductos(MYSQL* conectar) {
     int opcion;
     do {
@@ -1063,12 +1126,6 @@ void mostrarMarca(MYSQL* conectar) {
         mostrarError(conectar);
     }
 }
-void editarMarca(MYSQL* conectar) {
-    int id;
-    string nueva_marca;
-    cout << "Ingrese el ID de la marca a editar: ";
-    cin >> id;
-    cin.ignore(); // Limpiar el buffer después de leer el ID
 
     cout << "Ingrese el nuevo nombre de la marca: ";
     getline(cin, nueva_marca);
@@ -1399,5 +1456,3 @@ void imprimirFactura(MYSQL* conectar, int idventa) {
         mostrarError(conectar);
     }
 }
-
-
