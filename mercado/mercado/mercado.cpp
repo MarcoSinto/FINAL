@@ -1,3 +1,54 @@
+/*#include <mysql.h>
+#include <iostream>
+using namespace std;
+int q_estado;
+
+int main()
+{
+    MYSQL* conectar;
+    MYSQL_ROW fila;
+    MYSQL_RES* resultado(0);
+    conectar = mysql_init(0);
+    conectar = mysql_real_connect(conectar, "localhost", "edit_mercado", "Empres@123", "db_supermercado", 3306, NULL, 0);
+    if (conectar) {
+    //    cout << "Conexion exitosa..." << endl;
+      string puesto;
+        cout << "Ingrese Puesto: ";
+        cin >> puesto;
+        string insert = "Insert into puestos(puesto) values('" + puesto + "')";
+        const char* i = insert.c_str();
+        q_estado = mysql_query(conectar, i);
+        if (!q_estado) {
+            cout << "Ingreso Exitoso..." << endl;
+        }
+        else {
+            cout << "**** Error al ingresar *** " << endl;
+        }
+ 
+
+
+        string consulta = "select * from puestos";
+        const char* c = consulta.c_str();
+        q_estado = mysql_query(conectar, c);
+        if (!q_estado) {
+            resultado = mysql_store_result(conectar);
+            while (fila = mysql_fetch_row(resultado)) {
+                cout << fila[0] << ". " << fila[1] << endl;
+            }
+        }
+        else {
+            cout << "Error al consultar" << endl;
+        }
+    
+    }
+    else {
+        cout << "Error en la conexion..." << endl;
+    } 
+
+    return 0;
+}
+*/
+
 #include <mysql.h>
 #include <sstream>
 #include <iostream>
