@@ -21,7 +21,7 @@ void subMenuEmpleados(MYSQL* conectar);
 void subMenuProveedores(MYSQL* conectar);
 void subMenuProductos(MYSQL* conectar);
 
-//funciones
+//funciones declaradas
 void editarCliente(MYSQL* conectar);
 void agregarCliente(MYSQL* conectar);
 void mostrarCliente(MYSQL* conectar);
@@ -1377,7 +1377,7 @@ void imprimirFactura(MYSQL* conectar, int idventa) {
             catch (const out_of_range& e) {
                 cerr << "Error: out_of_range caught when converting total: " << e.what() << endl;
             }*/
-
+//Menu de la factura 
             cout << "============================== FACTURA ==============================" << endl;
             cout << "NIT Cliente: " << nit << endl;
             cout << "Nombre Cliente: " << nombres << " " << apellidos << endl;
